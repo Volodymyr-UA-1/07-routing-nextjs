@@ -1,4 +1,4 @@
-export type NoteTag = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
+export type NoteTag = "all" | "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
 
 // нотаткa
 export interface Note {
