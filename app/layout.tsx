@@ -3,8 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
-import Default from "./@modal/default";
-import Modal from "@/components/Modal/Modal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,10 +20,9 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children, modal
+  children, // Видалили modal звідси
 }: Readonly<{
   children: React.ReactNode;
-  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -33,8 +30,7 @@ export default function RootLayout({
         <TanStackProvider>
           <Header />
           <main>
-            {children}
-            {modal}
+            {children} {/* Видалили {modal} звідси */}
           </main>
           <Footer />
         </TanStackProvider>
