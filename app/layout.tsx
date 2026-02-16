@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Header from "@/components/Header/Header"; // Повертаємо імпорт
+import Footer from "@/components/Footer/Footer"; // Повертаємо імпорт
 import TanStackProvider from '@/components/TanStackProvider/TanStackProvider';
-import "./globals.css"; // Переконайся, що стилі підключені
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  modal // Слот для паралельного маршруту
+  modal
 }: {
   children: React.ReactNode;
   modal: React.ReactNode;
@@ -28,10 +30,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/* Обгортаємо ВСЕ в провайдер, щоб уникнути помилки No QueryClient set */}
         <TanStackProvider>
+          {/* Header має бути тут, щоб бути видимим на всіх сторінках */}
+          <Header /> 
+          
+          <main>
             {children}
-            {modal}
+          </main>
+          
+          {/* Слот для модалок, які тепер працюють коректно */}
+          {modal} 
+
+          <Footer />
         </TanStackProvider>
       </body>
     </html>
