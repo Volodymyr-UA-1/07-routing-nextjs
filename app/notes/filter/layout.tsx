@@ -5,16 +5,16 @@ export default function NotesLayout({
   children, 
   sidebar 
 }: { 
-  children: ReactNode, 
-  sidebar: ReactNode 
+  children: ReactNode; 
+  sidebar: ReactNode; 
 }) {
   return (
     <div className={css.container}>
       <aside className={css.sidebar}>
-        {sidebar}
+        {sidebar} {/* Тут ваш @sidebar з тегами */}
       </aside>
       <main className={css.notesWrapper}>
-        {children}
+        {children} {/* Тут буде все інше: форма, пошук, нотатки */}
       </main>
     </div>
   );

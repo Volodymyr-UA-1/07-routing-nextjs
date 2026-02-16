@@ -20,7 +20,6 @@ export default function Home() {
         </section>
 
         <div className={css.ctas}>
-          {/* Посилання на ваш робочий розділ нотаток */}
           <Link href="/notes/filter/all" className={css.primary}>
             View My Notes
           </Link>

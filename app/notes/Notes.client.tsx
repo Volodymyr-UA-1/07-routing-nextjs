@@ -1,10 +1,10 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
+import { usePathname } from "next/navigation";
 import { fetchNotes, FetchNotesResponse } from "@/lib/api";
 import NoteList from "@/components/NoteList/NoteList";
-import SearchBox from "@/components/SearchBox/SearchBox";
 import Pagination from "@/components/Pagination/Pagination";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
@@ -13,50 +13,40 @@ import css from "./Notes.module.css";
 
 const perPage = 12;
 
-interface NotesClientProps {
-    search: string;
-    currentPage: number;
-}
-export default function NotesClient({ search: initialSearch, currentPage: initialPage }: NotesClientProps) {
-    // Використовуємо пропси як початкові значення для useState
-    const [search, setSearch] = useState(initialSearch);
+export default function NotesClient({ currentPage: initialPage }: { currentPage: number }) {
+    const pathname = usePathname();
+    const tagFromPath = pathname.split("/").pop();
+    const tag = tagFromPath === "all" ? undefined : tagFromPath;
+
     const [page, setPage] = useState(initialPage);
+    const [search, setSearch] = useState("");
+    const [debouncedSearch] = useDebounce(search, 500);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const [debouncedSearch] = useDebounce(search, 500);
-
     const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse>({
-        queryKey: ["notes", debouncedSearch, page],
-        queryFn: () =>
-            fetchNotes({
-                search: debouncedSearch,
-                page,
-                perPage,
-            }),
+        queryKey: ["notes", tag, page, debouncedSearch],
+        queryFn: () => fetchNotes({ tag, page, perPage, search: debouncedSearch }),
         placeholderData: { notes: [], totalPages: 1 },
     });
 
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        setPage(1);
-    };
-
     const handlePageChange = (newPage: number) => {
         if (!data) return;
-        if (newPage >= 1 && newPage <= data.totalPages) {
-            setPage(newPage);
-        }
+        if (newPage >= 1 && newPage <= data.totalPages) setPage(newPage);
     };
 
     return (
         <div className={css.app}>
             <header className={css.toolbar}>
-                <SearchBox onSearch={handleSearch} />
-
+                <input
+                    className={css.searchInput}
+                    placeholder="Search notes..."
+                    type="text"
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                />
                 {data && data.totalPages > 1 && (
                     <Pagination page={page} totalPages={data.totalPages} onPageChange={handlePageChange} />
                 )}
-
                 <button className={css.button} onClick={() => setIsModalOpen(true)}>
                     Create note +
                 </button>
@@ -72,9 +62,7 @@ export default function NotesClient({ search: initialSearch, currentPage: initia
             )}
 
             {!isLoading && !isError && data && data.notes.length === 0 && (
-                <EmptyState
-                    message={debouncedSearch ? "No notes match your search" : "No notes yet"}
-                />
+                <EmptyState message={debouncedSearch ? "No notes match your search" : "No notes in this category"} />
             )}
 
             {isModalOpen && (

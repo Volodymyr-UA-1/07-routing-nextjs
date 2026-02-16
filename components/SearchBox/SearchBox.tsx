@@ -1,14 +1,16 @@
+'use client';
+
 import css from "./SearchBox.module.css";
 import { useDebouncedCallback } from "use-debounce";
 
 interface SearchBoxProps {
-    onSearch: (value: string) => void;
+    onSearch?: (value: string) => void;
 }
 
 export default function SearchBox({ onSearch }: SearchBoxProps) {
     const handleSearch = useDebouncedCallback(
         (value: string) => {
-            onSearch(value);
+            onSearch?.(value);
         },
         500
     );

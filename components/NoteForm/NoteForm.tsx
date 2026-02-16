@@ -8,7 +8,7 @@ import { createNote } from '@/lib/api';
 import { Note } from '@/types/note';
 
 interface NoteFormProps {
-    onCancel: () => void;
+    onCancel?: () => void;
 }
 
 const validationSchema = Yup.object({
@@ -35,7 +35,7 @@ export default function NoteForm({ onCancel }: NoteFormProps) {
                 exact: false
             });
             // Закриваємо модалку
-            onCancel();
+            onCancel?.();
         },
         onError: (error) => {
             console.error("Помилка при створенні:", error);
