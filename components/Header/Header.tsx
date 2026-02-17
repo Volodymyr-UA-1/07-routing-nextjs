@@ -8,7 +8,7 @@ interface HeaderProps {
 const Header = ({
     menuItems = [
         { title: 'Home', href: '/' },
-        { title: 'Notes', href: '/notes' },
+        { title: 'Notes', href: '/notes/filter/all' }, 
     ],
 }: HeaderProps) => {
     return (
