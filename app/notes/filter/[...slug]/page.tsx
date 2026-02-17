@@ -1,18 +1,10 @@
-import NotesClient from "@/app/notes/Notes.client";
-import css from "./NotesPage.module.css";
+import { use } from "react";
+import NotesClient from "./Notes.client";
 
-type Props = {
-  params: Promise<{ tag: string[] }>;
-  searchParams: Promise<{ page?: string }>;
-};
+export default function Page({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug } = use(params);
+  // Визначаємо початкову сторінку з query-параметрів або slug, якщо потрібно
+  const currentPage = 1; 
 
-export default async function NotesPage({ params, searchParams }: Props) {
-  const { page } = await searchParams;
-  const currentPage = Number(page) || 1;
-
-  return (
-    <div className={css.app}>
-      <NotesClient currentPage={currentPage} />
-    </div>
-  );
+  return <NotesClient currentPage={currentPage} />;
 }

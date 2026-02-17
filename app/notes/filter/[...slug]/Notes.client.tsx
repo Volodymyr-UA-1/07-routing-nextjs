@@ -10,7 +10,7 @@ import Pagination from "@/components/Pagination/Pagination";
 import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
 import EmptyState from "@/components/EmptyState/EmptyState";
-import css from "./Notes.module.css";
+import css from "./Notes.client.module.css";
 
 const perPage = 12;
 const VALID_TAGS = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
