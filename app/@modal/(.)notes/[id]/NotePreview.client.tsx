@@ -10,14 +10,15 @@ interface NotePreviewClientProps {
   id: string;
 }
 
-export default function NotePreviewClient({ id }: { id: string }) {
+export default function NotePreviewClient({ id }: NotePreviewClientProps) {
   const router = useRouter();
   const handleClose = () => router.back();
 
-  // Завантажуємо дані конкретної нотатки за ID
   const { data: note, isLoading, isError } = useQuery({
     queryKey: ['note', id],
     queryFn: () => fetchNoteById(id),
+    // Додаємо це налаштування сюди, як і в NoteDetailsClient
+    refetchOnMount: false, 
   });
 
   return (

@@ -1,9 +1,7 @@
-
 'use client';
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useDebounce } from "use-debounce";
-import { usePathname } from "next/navigation";
 import { fetchNotes, FetchNotesResponse } from "@/lib/api";
 import NoteList from "@/components/NoteList/NoteList";
 import Pagination from "@/components/Pagination/Pagination";
@@ -15,26 +13,31 @@ import css from "./Notes.client.module.css";
 const perPage = 12;
 const VALID_TAGS = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
-export default function NotesClient({ currentPage: initialPage }: { currentPage: number }) {
-  const pathname = usePathname();
-  
-  // 1. Стейти, яких не вистачало
-  const [page, setPage] = useState(initialPage);
+interface NotesClientProps {
+  initialTag: string; // Отримуємо тег як проп
+}
+
+export default function NotesClient({ initialTag }: NotesClientProps) {
+  // 1. Використовуємо тег виключно з пропсів, а не з usePathname
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebounce(search, 500);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 2. Логіка витягування тегу, щоб уникнути ID нотатки в запиті
-  const segments = pathname.split('/');
-  const filterIndex = segments.indexOf('filter');
-  const tagFromUrl = filterIndex !== -1 ? segments[filterIndex + 1] : undefined;
-  const tag = VALID_TAGS.includes(tagFromUrl || "") ? tagFromUrl : undefined;
+  // Визначаємо, чи є тег валідним для запиту до API
+  const activeTag = VALID_TAGS.includes(initialTag) ? initialTag : "";
 
-  // 3. Запит до API
+  // 2. Запит до API з використанням отриманого тега
   const { data, isLoading, isError, isFetching } = useQuery<FetchNotesResponse>({
-    queryKey: ["notes", tag, page, debouncedSearch],
-    queryFn: () => fetchNotes({ tag, page, perPage, search: debouncedSearch }),
-    placeholderData: (previousData) => previousData, // Запобігає зникненню фону
+    queryKey: ["notes", initialTag, page, debouncedSearch], // initialTag у ключі
+    queryFn: () => fetchNotes({ 
+      tag: activeTag, 
+      page, 
+      perPage, 
+      search: debouncedSearch 
+    }),
+    placeholderData: (previousData) => previousData,
+    staleTime: 1000 * 60, 
   });
 
   const handlePageChange = (newPage: number) => {
@@ -52,7 +55,7 @@ export default function NotesClient({ currentPage: initialPage }: { currentPage:
           value={search}
           onChange={(e) => { 
             setSearch(e.target.value); 
-            setPage(1); // Скидаємо на 1 сторінку при пошуку
+            setPage(1); 
           }}
         />
         {data && data.totalPages > 1 && (
@@ -72,7 +75,6 @@ export default function NotesClient({ currentPage: initialPage }: { currentPage:
         </>
       )}
 
-      {/* Показуємо порожній стан тільки якщо реально немає нотаток і запит успішний */}
       {!isLoading && !isError && data && data.notes.length === 0 && (
         <EmptyState message={debouncedSearch ? "No notes match your search" : "No notes in this category"} />
       )}

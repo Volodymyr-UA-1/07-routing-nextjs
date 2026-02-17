@@ -1,8 +1,26 @@
-import { use } from "react";
+import { QueryClient, dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { fetchNoteById } from '@/lib/api';
 import NotePreviewClient from "./NotePreview.client";
 
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params); // Next.js 15 потребує розпаковки params
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  // 1. Очікуємо id (Next.js 15 Server Component)
+  const { id } = await params; 
 
-  return <NotePreviewClient id={id} />;
+  const queryClient = new QueryClient();
+
+  // 2. Префетчимо дані нотатки на сервері
+  await queryClient.prefetchQuery({
+    queryKey: ['note', id],
+    queryFn: () => fetchNoteById(id),
+  });
+
+  // 3. Дегідруємо стан
+  const dehydratedState = dehydrate(queryClient);
+
+  return (
+    // 4. Обгортаємо в HydrationBoundary для миттєвого відображення на клієнті
+    <HydrationBoundary state={dehydratedState}>
+      <NotePreviewClient id={id} />
+    </HydrationBoundary>
+  );
 }
