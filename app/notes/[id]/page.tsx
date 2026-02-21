@@ -1,6 +1,8 @@
 import { QueryClient, dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { fetchNoteById } from '@/lib/api';
 import NoteDetailsClient from './NoteDetails.client';
+import { Metadata } from "next"
+
 
 type NotePageProps = {
   params: Promise<{ id: string }>; // params приходить як Promise в Next.js 15
